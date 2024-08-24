@@ -14,6 +14,7 @@ const currency: AppRouteModule = {
     icon: 'ph:currency-jpy-fill',
     title: t('routes.demo.currency.moduleName'),
     roles: [RoleEnum.SUPER],
+    hideMenu: true,
   },
   children: [
     {

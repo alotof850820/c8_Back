@@ -14,6 +14,7 @@ const home: AppRouteModule = {
     icon: 'arcticons:adguard-home-manager',
     title: t('routes.demo.home.moduleName'),
     roles: [RoleEnum.SUPER],
+    hideMenu: true,
   },
   children: [
     {

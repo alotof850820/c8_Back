@@ -1,48 +1,27 @@
-import { timHttp } from '@/utils/http/axios';
+import { timHttp, timMediaHttp } from '@/utils/http/axios';
 
 enum Api {
-  products = '/admin/products',
-  getCurrencyDropdowns = '/admin/currencies/dropdown',
+  products = '/products',
+  getCurrencyDropdowns = '/currencies/dropdown',
+  editProductsName = '/products/:query/name',
+  editProductsDescription = '/products/:query/description',
+  editProductsState = '/products/:query/state',
+  editProductsPrice = '/products/:query/price',
+  editProductsDiscount = '/products/:query/price/discount',
+  editProductsCoin = '/products/:query/coin',
+  editProductsImage = '/products/:query/image',
 }
 
-export interface ProductDetailApiRequest {
-  name: string;
-  introduce: string;
-  amount: number;
-  point: number;
-  type: number;
-  status: number;
-  productBooking: {
-    bookingTime: number;
-    type: number;
-  } | null;
-  productPoint: {
-    point: number;
-  } | null;
-}
-
-export interface ProductDetailApiResponse
-  extends Omit<ProductDetailApiRequest, 'productBooking' | 'productPoint'> {
-  id: number;
-  productBooking: {
-    id: number;
-    productId: number;
-    bookingTime: number;
-    type: number;
-  };
-  productPoint: {
-    id: number;
-    productId: number;
-    point: number;
-  };
-}
+const replaceQuery = (url: string, query: number | string): string => {
+  return url.replace(':query', query.toString());
+};
 
 /**
  * @description 新增商品
  */
-export const createProducts = async (params: ProductDetailApiRequest) =>
+export const createProducts = async (params) =>
   (
-    await timHttp.post({
+    await timMediaHttp.post({
       url: Api.products,
       params,
     })
@@ -51,20 +30,14 @@ export const createProducts = async (params: ProductDetailApiRequest) =>
 /**
  * @description 取得商品
  */
-export const getProducts = async (params: {
-  name: string;
-  type: number;
-  status: number;
-  pageIndex: number;
-  pageSize: number;
-}) => {
+export const getProducts = async (params) => {
   const res = await timHttp.get({
     url: Api.products,
     params,
   });
   const data = {
-    total: res.data.count,
-    items: res.data.items,
+    total: 100,
+    items: res.data,
   };
   return data;
 };
@@ -75,18 +48,18 @@ export const getProducts = async (params: {
 export const editProductName = async (productId: number, params: { name: string }) =>
   (
     await timHttp.patch({
-      url: `/admin/products/${productId}/name`,
+      url: replaceQuery(Api.editProductsName, productId),
       params,
     })
   ).data;
 
 /**
- * @description 修改商品金額
+ * @description 修改商品描述
  */
-export const editProductAmount = async (productId: number, params: { amount: string }) =>
+export const editProductDescription = async (productId: number, params: { description: string }) =>
   (
     await timHttp.patch({
-      url: `/admin/products/${productId}/amount`,
+      url: replaceQuery(Api.editProductsDescription, productId),
       params,
     })
   ).data;
@@ -94,42 +67,53 @@ export const editProductAmount = async (productId: number, params: { amount: str
 /**
  * @description 修改商品狀態
  */
-export const editProductStatus = async (productId: number, params: { status: number }) =>
+export const editProductStatus = async (productId: number, params: { state: number }) =>
   (
     await timHttp.patch({
-      url: `/admin/products/${productId}/status`,
+      url: replaceQuery(Api.editProductsState, productId),
       params,
     })
   ).data;
 
 /**
- * @description 修改商品點數
+ * @description 修改商品金額
  */
-export const editProductPoint = async (productId: number, params: { point: number }) =>
+export const editProductPrice = async (productId: number, params: { price: string }) =>
   (
     await timHttp.patch({
-      url: `/admin/products/${productId}/point`,
+      url: replaceQuery(Api.editProductsPrice, productId),
       params,
     })
   ).data;
 
 /**
- * @description 取得商品詳情
+ * @description 修改商品優惠價格
  */
-export const getProductDetail = async (productId: number): Promise<ProductDetailApiResponse> =>
+export const editProductDiscount = async (productId: number, params: { discount: number }) =>
   (
-    await timHttp.get({
-      url: `/admin/products/${productId}`,
+    await timHttp.patch({
+      url: replaceQuery(Api.editProductsDiscount, productId),
+      params,
+    })
+  ).data;
+/**
+ * @description 修改商品代幣
+ */
+export const editProductCoin = async (productId: number, params: { coin: number }) =>
+  (
+    await timHttp.patch({
+      url: replaceQuery(Api.editProductsCoin, productId),
+      params,
     })
   ).data;
 
 /**
- * @description 修改商品
+ * @description 修改商品圖片
  */
-export const editProduct = async (productId: number, params: ProductDetailApiRequest) =>
+export const editProductImage = async (productId: number, params: { image: string }) =>
   (
-    await timHttp.put({
-      url: `/admin/products/${productId}`,
+    await timMediaHttp.patch({
+      url: replaceQuery(Api.editProductsImage, productId),
       params,
     })
   ).data;

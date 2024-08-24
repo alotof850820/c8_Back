@@ -107,7 +107,8 @@ export const useUserStore = defineStore({
       return payloadData;
     },
     getRole(accessToken: string) {
-      return this.parseJWT(accessToken).role[1];
+      // return this.parseJWT(accessToken).role[1];
+      return this.parseJWT(accessToken).roles[0];
     },
     async FSTlogin(
       params: LoginApiRequest & { goHome?: boolean; mode?: ErrorMessageMode },
@@ -117,10 +118,8 @@ export const useUserStore = defineStore({
         const { goHome = true, mode, ...loginParams } = params;
         const data = await loginFSTApi(loginParams, mode);
 
-        const { accessToken, userId } = data.data;
-
+        const { accessToken, userId = 1 } = data.data;
         const userData = {
-          userId: userId,
           roles: this.getRole(accessToken),
         };
 
@@ -129,11 +128,10 @@ export const useUserStore = defineStore({
         } else {
           changeRole(RoleEnum.TEST);
         }
-
         sessionStorage.setItem('email', loginParams.account);
         localStorage.setItem('user_data', JSON.stringify(userData));
 
-        // localStorage.setItem('user_data', JSON.stringify({ userId }));
+        localStorage.setItem('user_data', JSON.stringify({ userId }));
 
         // save token
         this.setToken(accessToken);
@@ -185,7 +183,7 @@ export const useUserStore = defineStore({
         desc: 'manager',
         password: '123456',
         token: 'fakeToken1',
-        homePath: role === 'Admin' ? '/user/userList' : '/ownerChannel/ownerChannelStatsList',
+        homePath: role === 'Admin' ? '/coupon/couponList' : '/ownerChannel/ownerChannelStatsList',
         roles: [
           {
             roleName: 'Super Admin',

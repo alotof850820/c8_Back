@@ -14,6 +14,7 @@ const ownerBooking: AppRouteModule = {
     icon: 'tabler:brand-booking',
     title: t('routes.demo.booking.moduleName'),
     roles: [RoleEnum.TEST],
+    hideMenu: true,
   },
   children: [
     {

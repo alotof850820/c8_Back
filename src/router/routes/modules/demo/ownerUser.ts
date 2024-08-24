@@ -14,6 +14,7 @@ const ownerUser: AppRouteModule = {
     icon: 'bx:user',
     title: t('routes.demo.user.moduleName'),
     roles: [RoleEnum.TEST],
+    hideMenu: true,
   },
   children: [
     {

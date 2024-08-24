@@ -181,10 +181,6 @@
     "mineList": "会员管理",
     "editPassword": "修改密码"
   },
-  "user": {
-    "moduleName": "用户管理",
-    "customerCell": "用户列表"
-  },
   "girls": {
     "moduleName": "女优管理",
     "customerCell": "女优列表"
@@ -192,10 +188,6 @@
   "currency": {
     "moduleName": "币别管理",
     "customerCell": "币别列表"
-  },
-  "product": {
-    "moduleName": "商品管理",
-    "customerCell": "商品列表"
   },
   "booking": {
     "moduleName": "预约管理",
@@ -213,5 +205,30 @@
   "home": {
     "moduleName": "首頁管理",
     "customerCell": "首頁文章列表"
+  },
+
+  "coupon": {
+    "moduleName": "優惠券管理",
+    "customerCell": "優惠券列表"
+  },
+  "product": {
+    "moduleName": "商品管理",
+    "customerCell": "商品列表"
+  },
+  "tag": {
+    "moduleName": "標籤管理",
+    "customerCell": "標籤列表"
+  },
+  "trans": {
+    "moduleName": "交易管理",
+    "customerCell": "交易列表"
+  },
+  "user": {
+    "moduleName": "用户管理",
+    "customerCell": "用户列表"
+  },
+  "video": {
+    "moduleName": "影片管理",
+    "customerCell": "影片列表"
   }
 }

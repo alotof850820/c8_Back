@@ -14,6 +14,7 @@ const ownerChannel: AppRouteModule = {
     icon: 'uil:channel',
     title: t('routes.demo.ownerChannel.moduleName'),
     roles: [RoleEnum.TEST],
+    hideMenu: true,
   },
   children: [
     {

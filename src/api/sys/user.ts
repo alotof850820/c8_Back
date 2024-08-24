@@ -9,15 +9,14 @@ import {
 
 import { ErrorMessageMode } from '#/axios';
 
-// FST 改apiUrl
 enum Api {
   Login = '/login',
   Logout = '/logout',
   GetUserInfo = '/getUserInfo',
   GetPermCode = '/getPermCode',
   TestRetry = '/testRetry',
-  FSTlogin = '/backstages/login',
-  FSTeditPassword = '/backstages/password',
+  // C8 改apiUrl
+  C8login = '/admins/login',
 }
 
 /**
@@ -69,21 +68,11 @@ export function testRetry() {
 export function loginFSTApi(params: LoginApiRequest, mode: ErrorMessageMode = 'modal') {
   return timHttp.post<{ data: LoginApiResponse }>(
     {
-      url: Api.FSTlogin,
+      url: Api.C8login,
       params,
     },
     {
       errorMessageMode: mode,
     },
   );
-}
-
-/**
- * @description: FST edit password
- */
-export function editPassword(params: { password: string; confirmPassword: string }) {
-  return timHttp.patch({
-    url: Api.FSTeditPassword,
-    params,
-  });
 }

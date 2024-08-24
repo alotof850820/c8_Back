@@ -284,6 +284,9 @@ export const timHttp = createAxios({
     isReturnNativeResponse: true,
     withToken: true,
   },
+  headers: {
+    'ngrok-skip-browser-warning': 'true',
+  },
 });
 export const timHttpBigInt = createAxios({
   requestOptions: {
@@ -297,7 +300,7 @@ export const timHttpBigInt = createAxios({
   ],
 });
 export const timMediaHttp = createAxios({
-  headers: { 'Content-Type': ContentTypeEnum.FORM_DATA },
+  headers: { 'Content-Type': ContentTypeEnum.FORM_DATA, 'ngrok-skip-browser-warning': 'true' },
   requestOptions: {
     isReturnNativeResponse: true,
     withToken: true,

@@ -14,6 +14,7 @@ const girls: AppRouteModule = {
     icon: 'icon-park-outline:girl-two',
     title: t('routes.demo.girls.moduleName'),
     roles: [RoleEnum.SUPER],
+    hideMenu: true,
   },
   children: [
     {
