@@ -42,7 +42,7 @@ export const getVideo = async (params) => {
   });
   const data = {
     total: 100,
-    items: res.data.items,
+    items: res.data,
   };
   return data;
 };
@@ -58,7 +58,7 @@ export const getVideoDetail = async (videoId: number) => {
 };
 
 /**
- * @description 編輯用戶詳情
+ * @description 編輯影片詳情
  */
 export const editVideoDetail = async (videoId: number, data) => {
   await timHttp.put({

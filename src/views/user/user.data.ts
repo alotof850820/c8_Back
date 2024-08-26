@@ -1,115 +1,92 @@
 import { BasicColumn, FormSchema } from '@/components/Table';
 import { h } from 'vue';
-import { Avatar, Switch } from 'ant-design-vue';
+import { Switch, Tag } from 'ant-design-vue';
+import { editUsersStatus, patchUserImage } from '@/api/users';
 import { useMessage } from '@/hooks/web/useMessage';
-import { editVideoState } from '@/api/video';
+import { ImageUpload } from '@/components/Upload';
 
 export const columns: BasicColumn[] = [
   {
-    title: '影片ID',
+    title: '用户ID',
     dataIndex: 'id',
     width: 60,
   },
   {
-    title: '用戶',
-    dataIndex: 'user',
-    width: 180,
-    customRender: ({ record }) => {
-      return h(
-        'div',
-        {
-          style: 'display: flex; align-items: center; justify-content: center; gap: 10px',
-        },
-        {
-          default: () => [
-            h(Avatar, {
-              src: record.user.imageUrl,
-              style: 'width: 60px; height: 60px; border-radius: 50%;',
-            }),
-            h(
-              'div',
-              {
-                style:
-                  'display: flex; flex-direction: column; align-items: center; justify-content: center;',
-              },
-              {
-                default: () => [h('span', record.user.name), h('span', `用戶ID:${record.user.id}`)],
-              },
-            ),
-          ],
-        },
-      );
-    },
-  },
-  {
-    title: '標題',
-    dataIndex: 'title',
+    title: '邮箱',
+    dataIndex: 'email',
     width: 120,
     customRender: ({ record }) => {
       return h(
         'div',
         {},
         {
-          default: () => record.title,
+          default: () => record.email,
         },
       );
     },
   },
   {
-    title: '片長',
-    dataIndex: 'duration',
+    title: '昵称',
+    dataIndex: 'userName',
     width: 120,
     customRender: ({ record }) => {
       return h(
         'div',
         {},
         {
-          default: () => new Date(record.duration * 1000).toISOString().substr(14, 5),
+          default: () => record.userName,
         },
       );
     },
   },
-  // {
-  //   title: '头像',
-  //   dataIndex: 'imageUrl',
-  //   width: 120,
-  //   customRender: ({ record }) => {
-  //     return h(ImageUpload, {
-  //       value: record.imageUrl ? [record.imageUrl] : [],
-  //       api: () => {
-  //         return Promise.resolve({
-  //           url: 'https://tdesign.gtimg.com/demo/demo-image.jpg',
-  //         });
-  //       },
-  //       onChange: (value) => {
-  //         const formData = new FormData();
-  //         const data = {
-  //           image: value[0].originFileObj,
-  //         };
-  //         for (const key of Object.keys(data)) {
-  //           if (Array.isArray(data[key])) {
-  //             data[key].forEach((item: string, index) => {
-  //               formData.append(`${key}[${index}]`, item);
-  //             });
-  //           } else if (data[key] !== null) {
-  //             formData.append(key, data[key]);
-  //           }
-  //         }
-  //         patchUserImage(record.id, formData);
-  //       },
-  //       onClick: (e) => {
-  //         e.stopPropagation();
-  //       },
-  //     });
-  //   },
-  // },
   {
-    title: '上傳時間',
-    dataIndex: 'uploadTime',
+    title: '头像',
+    dataIndex: 'imageUrl',
     width: 120,
+    customRender: ({ record }) => {
+      return h(ImageUpload, {
+        value: record.imageUrl ? [record.imageUrl] : [],
+        api: () => {
+          return Promise.resolve({
+            url: 'https://tdesign.gtimg.com/demo/demo-image.jpg',
+          });
+        },
+        onChange: (value) => {
+          const formData = new FormData();
+          const data = {
+            image: value[0].originFileObj,
+          };
+          for (const key of Object.keys(data)) {
+            if (Array.isArray(data[key])) {
+              data[key].forEach((item: string, index) => {
+                formData.append(`${key}[${index}]`, item);
+              });
+            } else if (data[key] !== null) {
+              formData.append(key, data[key]);
+            }
+          }
+          patchUserImage(record.id, formData);
+        },
+        onClick: (e) => {
+          e.stopPropagation();
+        },
+      });
+    },
   },
   {
-    title: '影片狀態',
+    title: '性取向',
+    dataIndex: 'sexType',
+    width: 120,
+    customRender: ({ record }) => {
+      return h(
+        Tag,
+        { color: record.sexType === 0 ? 'green' : record.sexType === 1 ? 'pink' : 'orange' },
+        () => (record.sexType === 0 ? '男男' : record.sexType === 1 ? '女女' : '男女'),
+      );
+    },
+  },
+  {
+    title: '用户状态',
     dataIndex: 'status',
     width: 120,
     customRender: ({ record }) => {
@@ -127,7 +104,7 @@ export const columns: BasicColumn[] = [
             title: () => h('span', '系统提示'),
             content: () => h('span', '确认变更状态吗?'),
             onOk: async () => {
-              editVideoState(record.id, { status: record.status === 0 ? 1 : 0 })
+              editUsersStatus(record.id, { status: record.status === 0 ? 1 : 0 })
                 .then(() => {
                   record.status = record.status === 0 ? 1 : 0;
                   createMessage.success(`已成功修改用户状态`);
@@ -146,111 +123,39 @@ export const columns: BasicColumn[] = [
   },
 ];
 
-export const addVideoFormSchema: FormSchema[] = [
+export const addUserFormSchema: FormSchema[] = [
   {
-    field: 'userId',
-    label: '用戶ID',
+    field: 'userName',
+    label: '用户名',
     component: 'Input',
-    defaultValue: 0,
     required: true,
     componentProps: {
-      type: 'number',
+      maxlength: 20,
     },
   },
   {
-    field: 'title',
-    label: '標題',
+    field: 'password',
+    label: '密码',
+    component: 'InputPassword',
+    required: true,
+    componentProps: {
+      maxlength: 20,
+    },
+  },
+  {
+    field: 'email',
+    label: '邮箱',
     component: 'Input',
     required: true,
     componentProps: {
       maxlength: 50,
     },
-  },
-  {
-    field: 'description',
-    label: '描述',
-    component: 'InputTextArea',
-    required: true,
-    componentProps: {
-      maxlength: 1000,
-    },
-  },
-  {
-    field: 'coverPath',
-    label: '預覽圖',
-    component: 'ImageUpload',
-    required: true,
-    defaultValue: [],
-    componentProps: {
-      api: () => {
-        return Promise.resolve({
-          url: 'https://tdesign.gtimg.com/demo/demo-image.jpg',
-        });
+    rules: [
+      {
+        pattern: /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/,
+        message: '邮箱格式不正确',
       },
-      accept: ['png', 'jpeg', 'jpg'],
-      maxSize: 20,
-      maxNumber: 1,
-      multiple: false,
-      onChange: (val) => {
-        return val.originFileObj;
-      },
-    },
-  },
-  {
-    field: 'videoPath',
-    label: '影片',
-    component: 'ImageUpload',
-    required: true,
-    defaultValue: [],
-    componentProps: {
-      api: () => {
-        return Promise.resolve({
-          url: 'https://tdesign.gtimg.com/demo/demo-image.jpg',
-        });
-      },
-      accept: ['png', 'jpeg', 'jpg'],
-      maxSize: 20,
-      maxNumber: 1,
-      multiple: false,
-      onChange: (val) => {
-        return val.originFileObj;
-      },
-    },
-  },
-  {
-    field: 'previewPath',
-    label: '影片預覽圖',
-    component: 'ImageUpload',
-    required: true,
-    defaultValue: [],
-    componentProps: {
-      api: () => {
-        return Promise.resolve({
-          url: 'https://tdesign.gtimg.com/demo/demo-image.jpg',
-        });
-      },
-      accept: ['png', 'jpeg', 'jpg'],
-      maxSize: 20,
-      maxNumber: 1,
-      multiple: false,
-      onChange: (val) => {
-        return val.originFileObj;
-      },
-    },
-  },
-  {
-    field: 'tags',
-    label: '標籤',
-    component: 'Select',
-    required: true,
-    componentProps: {
-      mode: 'tags',
-      // options: [
-      //   { label: '免費', value: 0 },
-      //   { label: '廣告', value: 1 },
-      //   { label: '收費', value: 2 },
-      // ],
-    },
+    ],
   },
   {
     field: 'sexType',
@@ -268,32 +173,124 @@ export const addVideoFormSchema: FormSchema[] = [
   },
   {
     field: 'type',
-    label: '影片類型',
+    label: '用户类型',
     component: 'RadioButtonGroup',
     required: true,
     defaultValue: 0,
     componentProps: {
       options: [
-        { label: '免費', value: 0 },
-        { label: '廣告', value: 1 },
-        { label: '收費', value: 2 },
+        { label: '一般會員', value: 0 },
+        { label: '主播', value: 1 },
       ],
+    },
+  },
+  {
+    field: 'introduction',
+    label: '描述',
+    component: 'InputTextArea',
+    required: true,
+    componentProps: {
+      maxlength: 1000,
+    },
+  },
+  {
+    field: 'imagePath',
+    label: '头像',
+    component: 'ImageUpload',
+    required: true,
+    defaultValue: [],
+    componentProps: {
+      api: () => {
+        return Promise.resolve({
+          url: 'https://tdesign.gtimg.com/demo/demo-image.jpg',
+        });
+      },
+      accept: ['png', 'jpeg', 'jpg'],
+      maxSize: 20,
+      maxNumber: 1,
+      multiple: false,
+      onChange: (val) => {
+        return val.originFileObj;
+      },
+    },
+  },
+  {
+    field: 'backGroundPath',
+    label: '背景圖',
+    component: 'ImageUpload',
+    required: true,
+    defaultValue: [],
+    componentProps: {
+      api: () => {
+        return Promise.resolve({
+          url: 'https://tdesign.gtimg.com/demo/demo-image.jpg',
+        });
+      },
+      accept: ['png', 'jpeg', 'jpg'],
+      maxSize: 20,
+      maxNumber: 1,
+      multiple: false,
+      onChange: (val) => {
+        return val.originFileObj;
+      },
     },
   },
 ];
 
-export const videoDetailFormSchema: FormSchema[] = [
+export const userDetailFormSchema: FormSchema[] = [
   {
-    field: 'title',
-    label: '標題',
+    field: 'userName',
+    label: '用户名',
+    component: 'Input',
+    required: true,
+    componentProps: {
+      maxlength: 20,
+    },
+  },
+  {
+    field: 'email',
+    label: '邮箱',
     component: 'Input',
     required: true,
     componentProps: {
       maxlength: 50,
     },
+    rules: [
+      {
+        pattern: /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/,
+        message: '邮箱格式不正确',
+      },
+    ],
   },
   {
-    field: 'description',
+    field: 'sexType',
+    label: '性取向',
+    component: 'RadioButtonGroup',
+    required: true,
+    defaultValue: 0,
+    componentProps: {
+      options: [
+        { label: '男男', value: 0 },
+        { label: '女女', value: 1 },
+        { label: '男女', value: 2 },
+      ],
+    },
+  },
+  {
+    field: 'type',
+    label: '用户类型',
+    component: 'RadioButtonGroup',
+    required: true,
+    defaultValue: 0,
+    componentProps: {
+      options: [
+        { label: '一般會員', value: 0 },
+        { label: '主播', value: 1 },
+      ],
+    },
+  },
+  {
+    field: 'introduction',
     label: '描述',
     component: 'InputTextArea',
     required: true,
@@ -303,7 +300,7 @@ export const videoDetailFormSchema: FormSchema[] = [
   },
   {
     field: 'status',
-    label: '影片狀態',
+    label: '用戶狀態',
     component: 'RadioButtonGroup',
     required: true,
     defaultValue: 0,
@@ -315,45 +312,45 @@ export const videoDetailFormSchema: FormSchema[] = [
     },
   },
   {
-    field: 'sexType',
-    label: '性取向',
-    component: 'RadioButtonGroup',
-    required: true,
-    defaultValue: 0,
+    field: 'imageUrl',
+    label: '头像',
+    component: 'ImageUpload',
+    defaultValue: [],
     componentProps: {
-      options: [
-        { label: '男男', value: 0 },
-        { label: '女女', value: 1 },
-        { label: '男女', value: 2 },
-      ],
+      api: () => {
+        return Promise.resolve({
+          url: 'https://tdesign.gtimg.com/demo/demo-image.jpg',
+        });
+      },
+      accept: ['png', 'jpeg', 'jpg'],
+      maxSize: 20,
+      maxNumber: 1,
+      multiple: false,
+      onChange: (val) => {
+        return val.originFileObj;
+      },
+      disabled: true,
     },
   },
   {
-    field: 'type',
-    label: '影片類型',
-    component: 'RadioButtonGroup',
-    required: true,
-    defaultValue: 0,
+    field: 'backGroundUrl',
+    label: '背景圖',
+    component: 'ImageUpload',
+    defaultValue: [],
     componentProps: {
-      options: [
-        { label: '免費', value: 0 },
-        { label: '廣告', value: 1 },
-        { label: '收費', value: 2 },
-      ],
-    },
-  },
-  {
-    field: 'tags',
-    label: '標籤',
-    component: 'Select',
-    required: true,
-    componentProps: {
-      mode: 'tags',
-      // options: [
-      //   { label: '免費', value: 0 },
-      //   { label: '廣告', value: 1 },
-      //   { label: '收費', value: 2 },
-      // ],
+      api: () => {
+        return Promise.resolve({
+          url: 'https://tdesign.gtimg.com/demo/demo-image.jpg',
+        });
+      },
+      accept: ['png', 'jpeg', 'jpg'],
+      maxSize: 20,
+      maxNumber: 1,
+      multiple: false,
+      onChange: (val) => {
+        return val.originFileObj;
+      },
+      disabled: true,
     },
   },
 ];

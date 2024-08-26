@@ -17,6 +17,21 @@ const replaceQuery = (url: string, query: number | string): string => {
 };
 
 /**
+ * @description 取得金幣歷史紀錄
+ */
+export const getTrans = async (userId, params) => {
+  const res = await timHttp.get({
+    url: replaceQuery(Api.getTrans, userId),
+    params,
+  });
+  const data = {
+    total: 100,
+    items: res.data,
+  };
+  return data;
+};
+
+/**
  * @description 新增用戶
  */
 export const createUser = async (params) =>
@@ -37,7 +52,7 @@ export const getUsers = async (params) => {
   });
   const data = {
     total: 100,
-    items: res.data.items,
+    items: res.data,
   };
   return data;
 };
@@ -85,7 +100,7 @@ export const patchUserImage = async (userId: number, params) =>
   ).data;
 
 /**
- * @description 上船用戶頭貼(編輯資料用)
+ * @description 上船用戶背景(編輯資料用)
  */
 export const patchUserBgImage = async (userId: number, params) =>
   (

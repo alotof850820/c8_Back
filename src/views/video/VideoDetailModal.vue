@@ -10,16 +10,16 @@
   import { BasicForm, useForm } from '@/components/Form/index';
   import { useMessage } from '@/hooks/web/useMessage';
   import { ref } from 'vue';
-  import { editUserDetail, getUserDetail } from '@/api/users';
-  import { userDetailFormSchema } from './user.data';
+  import { videoDetailFormSchema } from './video.data';
+  import { editVideoDetail, getVideoDetail } from '@/api/video';
 
   const emit = defineEmits(['success', 'register']);
   const { createMessage } = useMessage();
-  const userId = ref(0);
+  const videoId = ref(0);
 
   const [registerForm, { resetFields, validate, setFieldsValue }] = useForm({
     labelWidth: 100,
-    schemas: userDetailFormSchema,
+    schemas: videoDetailFormSchema,
     showActionButtonGroup: false,
     actionColOptions: {
       span: 23,
@@ -28,25 +28,20 @@
 
   const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
     resetFields();
-    userId.value = data.id;
-    const res = await getUserDetail(userId.value);
+    videoId.value = data.id;
+    const res = await getVideoDetail(videoId.value);
     setFieldsValue({
       ...res,
+      status: data.status,
     });
   });
   async function handleSubmit() {
     try {
       const values = await validate();
-      const data = {
-        email: values.email,
-        userName: values.userName,
-        introduction: values.introduction,
-        sexType: values.sexType,
-        type: values.type,
-        status: values.status,
-      };
 
-      await editUserDetail(userId.value, data);
+      console.log(values);
+
+      await editVideoDetail(videoId.value, values);
       resetFields();
       createMessage.success(`修改成功`);
       emit('success');

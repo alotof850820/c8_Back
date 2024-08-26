@@ -11,7 +11,7 @@ const tag: AppRouteModule = {
   redirect: '/tagList',
   meta: {
     orderNo: 11000,
-    icon: 'ri:coupon-3-fill',
+    icon: 'mdi:tag',
     title: t('routes.demo.tag.moduleName'),
     roles: [RoleEnum.SUPER],
   },

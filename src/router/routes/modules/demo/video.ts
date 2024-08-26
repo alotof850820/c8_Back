@@ -11,7 +11,7 @@ const video: AppRouteModule = {
   redirect: '/videoList',
   meta: {
     orderNo: 13000,
-    icon: 'ri:coupon-3-fill',
+    icon: 'mingcute:video-fill',
     title: t('routes.demo.video.moduleName'),
     roles: [RoleEnum.SUPER],
   },
