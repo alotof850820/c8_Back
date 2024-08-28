@@ -19,9 +19,14 @@ const replaceQuery = (url: string, query: number | string): string => {
 /**
  * @description 取得金幣歷史紀錄
  */
-export const getTrans = async (userId, params) => {
+export const getTrans = async (raw) => {
+  const params = {
+    pageIndex: raw.pageIndex,
+    pageSize: raw.pageSize,
+  };
+
   const res = await timHttp.get({
-    url: replaceQuery(Api.getTrans, userId),
+    url: replaceQuery(Api.getTrans, raw.userId),
     params,
   });
   const data = {

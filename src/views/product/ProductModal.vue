@@ -27,35 +27,24 @@
   });
   async function handleSubmit() {
     try {
-      const values = await validate();
+      const value = await validate();
 
+      const formData = new FormData();
       const data = {
-        name: values.name,
-        introduce: values.introduce,
-        amount: values.amount,
-        point: values.point,
-        type: values.type,
-        status: values.status,
-        productBooking: {
-          bookingTime: values.bookingTime,
-          type: values.bookingType,
-        },
-        productPoint: null,
-        // productBooking:
-        //   values.bookingType && values.bookingTime
-        //     ? {
-        //         bookingTime: values.bookingTime,
-        //         type: values.bookingType,
-        //       }
-        //     : null,
-        // productPoint: values.productPoint
-        //   ? {
-        //       point: values.productPoint,
-        //     }
-        //   : null,
+        ...value,
+        image: value.image[0].originFileObj,
       };
+      for (const key of Object.keys(data)) {
+        if (Array.isArray(data[key])) {
+          data[key].forEach((item: string, index) => {
+            formData.append(`${key}[${index}]`, item);
+          });
+        } else if (data[key] !== null) {
+          formData.append(key, data[key]);
+        }
+      }
 
-      await createProducts(data);
+      await createProducts(formData);
       createMessage.success(`创建成功`);
       emit('success');
       closeModal();

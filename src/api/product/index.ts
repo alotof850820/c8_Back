@@ -78,7 +78,7 @@ export const editProductStatus = async (productId: number, params: { state: numb
 /**
  * @description 修改商品金額
  */
-export const editProductPrice = async (productId: number, params: { price: string }) =>
+export const editProductPrice = async (productId: number, params: { price: number }) =>
   (
     await timHttp.patch({
       url: replaceQuery(Api.editProductsPrice, productId),
@@ -89,7 +89,7 @@ export const editProductPrice = async (productId: number, params: { price: strin
 /**
  * @description 修改商品優惠價格
  */
-export const editProductDiscount = async (productId: number, params: { discount: number }) =>
+export const editProductDiscount = async (productId: number, params: { discountPrice: number }) =>
   (
     await timHttp.patch({
       url: replaceQuery(Api.editProductsDiscount, productId),
@@ -110,7 +110,7 @@ export const editProductCoin = async (productId: number, params: { coin: number 
 /**
  * @description 修改商品圖片
  */
-export const editProductImage = async (productId: number, params: { image: string }) =>
+export const editProductImage = async (productId: number, params: FormData) =>
   (
     await timMediaHttp.patch({
       url: replaceQuery(Api.editProductsImage, productId),

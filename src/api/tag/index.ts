@@ -26,5 +26,5 @@ export const getTags = async (params) => {
 /**
  * @description 編輯標籤狀態
  */
-export const editTagEnable = async (tagId: number, data: { enable: number }) =>
+export const editTagEnable = async (tagId: number, data: { enable: boolean }) =>
   (await timHttp.patch({ url: replaceQuery(Api.editTags, tagId), data })).data;

@@ -5,18 +5,14 @@
         <a-button type="primary" @click="openModal">创建用戶</a-button>
       </template>
       <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'bookingId'">
-          <BasicButton
-            :disabled="!record.bookingId"
-            type="primary"
-            @click="openDetailModal(true, record)"
-            >{{ record.bookingId ? '查看預約' : '尚未进行' }}</BasicButton
-          >
+        <template v-if="column.key === 'action'">
+          <BasicButton type="primary" @click="handleClick(record, $event)"> 查看 </BasicButton>
         </template>
       </template>
     </BasicTable>
     <UserDetailModal @register="registerDetailModal" @success="reload()" />
     <AddUserModal @register="registerModal" @success="reload()" />
+    <MoneyHistoryModalModal @register="registerMoneyHistoryModal" @success="reload()" />
   </div>
 </template>
 
@@ -28,8 +24,10 @@
   import UserDetailModal from './UserDetailModal.vue';
   import BasicButton from '@/components/Button/src/BasicButton.vue';
   import AddUserModal from './AddUserModal.vue';
+  import MoneyHistoryModalModal from './MoneyHistoryModal.vue';
 
   const [registerDetailModal, { openModal: openDetailModal }] = useModal();
+  const [registerMoneyHistoryModal, { openModal: openMoneyHistoryModal }] = useModal();
   const [registerModal, { openModal }] = useModal();
   const [registerTable, { reload }] = useTable({
     title: '用户列表',
@@ -61,6 +59,12 @@
     bordered: true,
     showIndexColumn: false,
     clickToRowSelect: false,
+    actionColumn: {
+      width: 160,
+      title: '查看金幣歷史紀錄',
+      dataIndex: 'action',
+      fixed: false,
+    },
     rowKey: 'id',
     customRow: (record) => {
       return {
@@ -73,6 +77,11 @@
       };
     },
   });
+
+  const handleClick = (record, e) => {
+    e.stopPropagation();
+    openMoneyHistoryModal(true, record);
+  };
 </script>
 
 <style></style>

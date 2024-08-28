@@ -1,13 +1,17 @@
 import { BasicColumn, FormSchema } from '@/components/Table';
-import { computed, ComputedRef, h, ref } from 'vue';
-import { Input, Switch, Tag } from 'ant-design-vue';
+import { h } from 'vue';
+import { Input, Switch, Textarea } from 'ant-design-vue';
 import { useMessage } from '@/hooks/web/useMessage';
 import {
-  editProductAmount,
+  editProductCoin,
+  editProductDescription,
+  editProductDiscount,
+  editProductImage,
   editProductName,
-  editProductPoint,
+  editProductPrice,
   editProductStatus,
 } from '@/api/product';
+import { ImageUpload } from '@/components/Upload';
 
 export const columns: BasicColumn[] = [
   {
@@ -42,98 +46,145 @@ export const columns: BasicColumn[] = [
     },
   },
   {
-    title: '介绍',
-    dataIndex: 'introduce',
+    title: '描述',
+    dataIndex: 'description',
     minWidth: 200,
     customRender: ({ record }) => {
-      return h('span', {}, record.introduce || '-');
-    },
-  },
-  {
-    title: '商品金额',
-    dataIndex: 'amount',
-    minWidth: 200,
-    helpMessage: '商品类型为充值时，金额为人民币，商品类型为预约包时，金额为点数',
-    customRender: ({ record }) => {
-      const handleBlur = async (e: any) => {
-        const { createMessage } = useMessage();
-        try {
-          if (record.amount === +e.target.value) return;
-          await editProductAmount(record.id, { amount: e.target?.value?.toString() || '' });
-          record.amount = e.target.value;
-          createMessage.success('编辑成功');
-        } catch (error) {
-          createMessage.error('编辑失败');
-        }
-      };
-      const handleClick = (e: any) => {
-        e.stopPropagation();
-      };
-      return (
-        <div style="display: flex; align-items: center; gap: 4px">
-          <Input value={record.amount} onBlur={handleBlur} onClick={handleClick} />
-          <div style="white-space: nowrap"> 人民币</div>
-        </div>
-      );
-    },
-  },
-  {
-    title: '商品点数',
-    dataIndex: 'point',
-    minWidth: 200,
-    customRender: ({ record }) => {
-      const handleBlur = async (e: any) => {
-        const { createMessage } = useMessage();
-        try {
-          if (record.point === +e.target.value) return;
-          await editProductPoint(record.id, { point: +e.target?.value || 0 });
-          record.point = +e.target.value;
-          createMessage.success('编辑成功');
-        } catch (error) {
-          createMessage.error('编辑失败');
-        }
-      };
-      const handleClick = (e: any) => {
-        e.stopPropagation();
-      };
-      return (
-        <div style="display: flex; align-items: center; gap: 4px">
-          <Input value={record.point} onBlur={handleBlur} onClick={handleClick} />
-          <div style="white-space: nowrap"> 点数</div>
-        </div>
-      );
-    },
-  },
-  {
-    title: '商品类型',
-    dataIndex: 'type',
-    minWidth: 60,
-    customRender: ({ record }) => {
-      return h(Tag, {}, () => {
-        if (record.type === 0) {
-          return '充值';
-        } else if (record.type === 1) {
-          return '预约包';
-        }
+      return h(Textarea, {
+        value: record.description,
+        onBlur: (e: any) => {
+          if (record.description === e.target.value) return;
+          editProductDescription(record.id, { description: e.target?.value?.toString() || '' })
+            .then(() => {
+              record.description = e.target.value;
+              const { createMessage } = useMessage();
+              createMessage.success('编辑成功');
+            })
+            .then(() => {
+              const { createMessage } = useMessage();
+              createMessage.error('编辑失败');
+            });
+        },
+        onClick: (e) => {
+          e.stopPropagation();
+        },
       });
     },
   },
   {
+    title: '優惠價 (售價)',
+    dataIndex: 'discountPrice',
+    minWidth: 200,
+    customRender: ({ record }) => {
+      const handleBlur = async (e: any) => {
+        const { createMessage } = useMessage();
+        try {
+          if (record.discountPrice === +e.target.value) return;
+          await editProductDiscount(record.id, { discountPrice: +e.target?.value || 0 });
+          record.discountPrice = e.target.value;
+          createMessage.success('编辑成功');
+        } catch (error) {
+          createMessage.error('编辑失败');
+        }
+      };
+      const handleClick = (e: any) => {
+        e.stopPropagation();
+      };
+      return (
+        <div style="display: flex; align-items: center; gap: 4px">
+          <Input
+            value={record.discountPrice}
+            onBlur={handleBlur}
+            onClick={handleClick}
+            onInput={(e: any) => (record.discountPrice = e.target.value.replace(/[^\d]/g, ''))}
+          />
+          <div style="white-space: nowrap"> 優惠價</div>
+        </div>
+      );
+    },
+  },
+  {
+    title: '單價',
+    dataIndex: 'price',
+    minWidth: 200,
+    customRender: ({ record }) => {
+      const handleBlur = async (e: any) => {
+        const { createMessage } = useMessage();
+        try {
+          if (record.price === +e.target.value) return;
+          await editProductPrice(record.id, { price: +e.target?.value || 0 });
+          record.price = +e.target.value;
+          createMessage.success('编辑成功');
+        } catch (error) {
+          createMessage.error('编辑失败');
+        }
+      };
+      const handleClick = (e: any) => {
+        e.stopPropagation();
+      };
+      return (
+        <div style="display: flex; align-items: center; gap: 4px">
+          <Input
+            value={record.price}
+            onBlur={handleBlur}
+            onClick={handleClick}
+            onInput={(e: any) => (record.price = e.target.value.replace(/[^\d]/g, ''))}
+          />
+          <div style="white-space: nowrap"> 元</div>
+        </div>
+      );
+    },
+  },
+  {
+    title: '代幣',
+    helpMessage: '儲值後會拿到的代幣',
+    dataIndex: 'coin',
+    minWidth: 200,
+    customRender: ({ record }) => {
+      const handleBlur = async (e: any) => {
+        const { createMessage } = useMessage();
+        try {
+          if (record.coin === +e.target.value) return;
+          await editProductCoin(record.id, { coin: +e.target?.value || 0 });
+          record.coin = e.target.value;
+          createMessage.success('编辑成功');
+        } catch (error) {
+          createMessage.error('编辑失败');
+        }
+      };
+      const handleClick = (e: any) => {
+        e.stopPropagation();
+      };
+      return (
+        <div style="display: flex; align-items: center; gap: 4px">
+          <Input
+            value={record.coin}
+            onBlur={handleBlur}
+            onClick={handleClick}
+            type="number"
+            onInput={(e: any) => (record.coin = e.target.value.replace(/[^\d]/g, ''))}
+          />
+          <div style="white-space: nowrap"> 代幣</div>
+        </div>
+      );
+    },
+  },
+  {
     title: '商品状态',
-    dataIndex: 'status',
+    dataIndex: 'state',
     width: 120,
     customRender: ({ record }) => {
       return h(Switch, {
-        checked: record.status === 0,
+        checked: record.state === 0,
         checkedChildren: '上架',
         unCheckedChildren: '下架',
         loading: record.pendingStatus,
         onClick: (_, e) => {
           e.stopPropagation();
           const { createMessage } = useMessage();
-          editProductStatus(record.id, { status: record.status === 0 ? 1 : 0 })
+          editProductStatus(record.id, { state: record.state === 0 ? 1 : 0 })
             .then(() => {
-              record.status = record.status === 0 ? 1 : 0;
+              record.state = record.state === 0 ? 1 : 0;
               createMessage.success(`已成功修改商品状态`);
             })
             .catch(() => {
@@ -146,33 +197,44 @@ export const columns: BasicColumn[] = [
       });
     },
   },
+  {
+    title: '商品圖片',
+    dataIndex: 'imageUrl',
+    customRender: ({ record }) => {
+      return h(ImageUpload, {
+        value: record.imageUrl ? [record.imageUrl] : [],
+        api: () => {
+          return Promise.resolve({
+            url: 'https://tdesign.gtimg.com/demo/demo-image.jpg',
+          });
+        },
+        onChange: (value) => {
+          const formData = new FormData();
+          const data = {
+            image: value[0].originFileObj,
+          };
+          for (const key of Object.keys(data)) {
+            if (Array.isArray(data[key])) {
+              data[key].forEach((item: string, index) => {
+                formData.append(`${key}[${index}]`, item);
+              });
+            } else if (data[key] !== null) {
+              formData.append(key, data[key]);
+            }
+          }
+          editProductImage(record.id, formData);
+        },
+        onClick: (e) => {
+          e.stopPropagation();
+        },
+      });
+    },
+  },
 ];
 
 export const searchFormSchema: FormSchema[] = [
   {
-    field: 'name',
-    label: '商品名称',
-    component: 'Input',
-    colProps: {
-      span: 8,
-    },
-  },
-  {
-    field: 'type',
-    label: '商品类型',
-    component: 'RadioButtonGroup',
-    colProps: {
-      span: 8,
-    },
-    componentProps: {
-      options: [
-        { label: '充值', value: 0 },
-        { label: '预约包', value: 1 },
-      ],
-    },
-  },
-  {
-    field: 'status',
+    field: 'state',
     label: '商品状态',
     component: 'RadioButtonGroup',
     colProps: {
@@ -187,427 +249,74 @@ export const searchFormSchema: FormSchema[] = [
   },
 ];
 
-export const productType = ref(1);
-
-export const productFormSchema: ComputedRef<FormSchema[]> = computed(() =>
-  productType.value === 0
-    ? [
-        {
-          field: 'name',
-          label: '名称',
-          component: 'Input',
-          required: true,
-          defaultValue: '',
-        },
-        {
-          field: 'introduce',
-          label: '介绍',
-          component: 'InputTextArea',
-          defaultValue: '',
-          componentProps: {
-            maxlength: 200,
-          },
-          colProps: {
-            span: 20,
-          },
-        },
-        {
-          field: 'amount',
-          label: '商品金额',
-          component: 'InputNumber',
-          helpMessage: '商品类型为充值时，金额为人民币，商品类型为预约包时，金额为点数',
-          required: true,
-          defaultValue: 0,
-          colProps: {
-            span: 12,
-          },
-          componentProps: {
-            min: 0,
-            precision: 2,
-          },
-        },
-        {
-          field: 'point',
-          label: '点数',
-          component: 'InputNumber',
-          required: true,
-          defaultValue: 0,
-          colProps: {
-            span: 12,
-          },
-          componentProps: {
-            min: 0,
-            precision: 2,
-          },
-        },
-        {
-          field: 'status',
-          label: '商品状态',
-          component: 'RadioButtonGroup',
-          defaultValue: 0,
-          colProps: {
-            xl: 12,
-            xxl: 8,
-          },
-          componentProps: {
-            options: [
-              { label: '上架', value: 0 },
-              { label: '下架', value: 1 },
-            ],
-          },
-        },
-        {
-          field: 'type',
-          label: '商品类型',
-          component: 'RadioButtonGroup',
-          defaultValue: 1,
-          colProps: {
-            xl: 12,
-            xxl: 8,
-          },
-          componentProps: {
-            options: [
-              // { label: '充值', value: 0 },
-              { label: '预约包', value: 1 },
-            ],
-            onChange: (value) => {
-              productType.value = +value;
-            },
-          },
-        },
-        // {
-        //   field: 'productPoint',
-        //   label: '商品点数',
-        //   component: 'InputNumber',
-        //   required: true,
-        //   componentProps: {
-        //     min: 0,
-        //   },
-        //   helpMessage: '商品类型为充值时必填',
-        // },
-      ]
-    : [
-        {
-          field: 'name',
-          label: '名称',
-          component: 'Input',
-          required: true,
-          defaultValue: '',
-        },
-        {
-          field: 'introduce',
-          label: '介绍',
-          component: 'InputTextArea',
-          defaultValue: '',
-          componentProps: {
-            maxlength: 200,
-          },
-          colProps: {
-            span: 20,
-          },
-        },
-        {
-          field: 'amount',
-          label: '商品金额',
-          component: 'InputNumber',
-          helpMessage: '商品类型为充值时，金额为人民币，商品类型为预约包时，金额为点数',
-          required: true,
-          defaultValue: 0,
-          colProps: {
-            span: 12,
-          },
-          componentProps: {
-            min: 0,
-            precision: 2,
-          },
-        },
-        {
-          field: 'point',
-          label: '点数',
-          component: 'InputNumber',
-          required: true,
-          defaultValue: 0,
-          colProps: {
-            span: 12,
-          },
-          componentProps: {
-            min: 0,
-            precision: 2,
-          },
-        },
-        {
-          field: 'status',
-          label: '商品状态',
-          component: 'RadioButtonGroup',
-          defaultValue: 0,
-          colProps: {
-            xl: 12,
-            xxl: 8,
-          },
-          componentProps: {
-            options: [
-              { label: '上架', value: 0 },
-              { label: '下架', value: 1 },
-            ],
-          },
-        },
-        {
-          field: 'type',
-          label: '商品类型',
-          component: 'RadioButtonGroup',
-          defaultValue: 1,
-          colProps: {
-            xl: 12,
-            xxl: 8,
-          },
-          componentProps: {
-            options: [
-              // { label: '充值', value: 0 },
-              { label: '预约包', value: 1 },
-            ],
-            onChange: (value) => {
-              productType.value = +value;
-            },
-          },
-        },
-        {
-          field: 'bookingTime',
-          label: '预约次数或年限长度',
-          component: 'InputNumber',
-          labelWidth: 170,
-          required: true,
-          defaultValue: 0,
-          componentProps: {
-            min: 0,
-          },
-          helpMessage: '商品类型为预约包时必填',
-        },
-        {
-          field: 'bookingType',
-          label: '预约类型',
-          component: 'RadioButtonGroup',
-          helpMessage: '商品类型为预约包时必填',
-          defaultValue: 0,
-          colProps: {
-            xl: 12,
-            xxl: 8,
-          },
-          required: true,
-          componentProps: {
-            options: [
-              { label: '次数', value: 0 },
-              { label: '包年', value: 1 },
-            ],
-          },
-        },
-      ],
-);
-export const editProductDetailFormSchema: ComputedRef<FormSchema[]> = computed(() =>
-  productType.value === 0
-    ? [
-        {
-          field: 'name',
-          label: '名称',
-          component: 'Input',
-          required: true,
-          defaultValue: '',
-        },
-        {
-          field: 'introduce',
-          label: '介绍',
-          component: 'InputTextArea',
-          defaultValue: '',
-          componentProps: {
-            maxlength: 200,
-          },
-          colProps: {
-            span: 20,
-          },
-        },
-        {
-          field: 'amount',
-          label: '商品金额',
-          component: 'InputNumber',
-          helpMessage: '商品类型为充值时，金额为人民币，商品类型为预约包时，金额为点数',
-          required: true,
-          defaultValue: 0,
-          colProps: {
-            span: 7,
-          },
-          componentProps: {
-            min: 0,
-            precision: 2,
-          },
-        },
-        {
-          field: 'point',
-          label: '点数',
-          component: 'InputNumber',
-          required: true,
-          defaultValue: 0,
-          colProps: {
-            span: 12,
-          },
-          componentProps: {
-            min: 0,
-            precision: 2,
-          },
-        },
-        {
-          field: 'status',
-          label: '商品状态',
-          component: 'RadioButtonGroup',
-          defaultValue: 0,
-          colProps: {
-            xl: 12,
-            xxl: 8,
-          },
-          componentProps: {
-            options: [
-              { label: '上架', value: 0 },
-              { label: '下架', value: 1 },
-            ],
-          },
-        },
-        {
-          field: 'type',
-          label: '商品类型',
-          labelWidth: 0,
-          component: 'RadioButtonGroup',
-          defaultValue: 1,
-          colProps: {
-            xl: 12,
-            xxl: 8,
-          },
-          componentProps: {
-            options: [
-              // { label: '充值', value: 0 },
-              { label: '预约包', value: 1 },
-            ],
-            onChange: (value) => {
-              productType.value = +value;
-            },
-          },
-        },
-        // {
-        //   field: 'productPoint',
-        //   label: '商品点数',
-        //   component: 'InputNumber',
-        //   required: true,
-        //   defaultValue: 0,
-        //   componentProps: {
-        //     min: 0,
-        //   },
-        //   helpMessage: '商品类型为充值时必填',
-        // },
-      ]
-    : [
-        {
-          field: 'name',
-          label: '名称',
-          component: 'Input',
-          required: true,
-          defaultValue: '',
-        },
-        {
-          field: 'introduce',
-          label: '介绍',
-          component: 'InputTextArea',
-          defaultValue: '',
-          componentProps: {
-            maxlength: 200,
-          },
-          colProps: {
-            span: 20,
-          },
-        },
-        {
-          field: 'amount',
-          label: '商品金额',
-          component: 'InputNumber',
-          helpMessage: '商品类型为充值时，金额为人民币，商品类型为预约包时，金额为点数',
-          required: true,
-          defaultValue: 0,
-          colProps: {
-            span: 7,
-          },
-          componentProps: {
-            min: 0,
-            precision: 2,
-          },
-        },
-        {
-          field: 'point',
-          label: '点数',
-          component: 'InputNumber',
-          required: true,
-          defaultValue: 0,
-          colProps: {
-            span: 12,
-          },
-          componentProps: {
-            min: 0,
-            precision: 2,
-          },
-        },
-        {
-          field: 'status',
-          label: '商品状态',
-          component: 'RadioButtonGroup',
-          defaultValue: 0,
-          componentProps: {
-            options: [
-              { label: '上架', value: 0 },
-              { label: '下架', value: 1 },
-            ],
-          },
-        },
-        {
-          field: 'type',
-          label: '商品类型',
-          component: 'RadioButtonGroup',
-          defaultValue: 1,
-          colProps: {
-            xl: 12,
-            xxl: 8,
-          },
-          componentProps: {
-            options: [
-              // { label: '充值', value: 0 },
-              { label: '预约包', value: 1 },
-            ],
-            onChange: (value) => {
-              productType.value = +value;
-            },
-          },
-        },
-        {
-          field: 'bookingTime',
-          label: '预约次数或年限长度',
-          component: 'InputNumber',
-          labelWidth: 170,
-          required: true,
-          componentProps: {
-            min: 0,
-          },
-          helpMessage: '商品类型为预约包时必填',
-        },
-        {
-          field: 'bookingType',
-          label: '预约类型',
-          component: 'RadioButtonGroup',
-          helpMessage: '商品类型为预约包时必填',
-          colProps: {
-            xl: 12,
-            xxl: 8,
-          },
-          required: true,
-          componentProps: {
-            options: [
-              { label: '次数', value: 0 },
-              { label: '包年', value: 1 },
-            ],
-          },
-        },
-      ],
-);
+export const productFormSchema: FormSchema[] = [
+  {
+    field: 'name',
+    label: '名称',
+    component: 'Input',
+    required: true,
+    defaultValue: '',
+    componentProps: {
+      placeholder: '请输入商品名称',
+      maxlength: 50,
+    },
+  },
+  {
+    field: 'description',
+    label: '描述',
+    component: 'InputTextArea',
+    componentProps: {
+      maxlength: 50,
+    },
+  },
+  {
+    field: 'price',
+    label: '價格',
+    component: 'InputNumber',
+    required: true,
+    defaultValue: 0,
+    componentProps: {
+      min: 0,
+      max: Number.MAX_SAFE_INTEGER,
+    },
+  },
+  {
+    field: 'discountedPrice',
+    label: '優惠價',
+    component: 'InputNumber',
+    componentProps: {
+      min: 0,
+      max: Number.MAX_SAFE_INTEGER,
+    },
+  },
+  {
+    field: 'coin',
+    label: '代幣',
+    component: 'InputNumber',
+    required: true,
+    defaultValue: 0,
+    componentProps: {
+      min: 0,
+      max: Number.MAX_SAFE_INTEGER,
+    },
+  },
+  {
+    field: 'image',
+    label: '商品圖片',
+    component: 'ImageUpload',
+    componentProps: {
+      api: () => {
+        return Promise.resolve({
+          url: 'https://tdesign.gtimg.com/demo/demo-image.jpg',
+        });
+      },
+      accept: ['png', 'jpeg', 'jpg', 'webp'],
+      maxSize: 20,
+      maxNumber: 1,
+      multiple: false,
+      onChange: (val) => {
+        return val.originFileObj;
+      },
+    },
+  },
+];

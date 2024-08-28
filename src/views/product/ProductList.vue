@@ -6,7 +6,6 @@
       </template>
     </BasicTable>
     <ProductModal @register="registerModal" @success="reload()" />
-    <ProductDetailModal @register="registerDetailModal" @success="reload()" />
   </div>
 </template>
 
@@ -14,12 +13,10 @@
   import { BasicTable, useTable } from '@/components/Table';
   import { columns, searchFormSchema } from './product.data';
   import ProductModal from './ProductModal.vue';
-  import ProductDetailModal from './ProductDetailModal.vue';
   import { useModal } from '@/components/Modal';
   import { getProducts } from '@/api/product';
 
   const [registerModal, { openModal }] = useModal();
-  const [registerDetailModal, { openModal: openDetailModal }] = useModal();
   const [registerTable, { reload, getForm }] = useTable({
     title: '商品列表',
     api: getProducts,
@@ -52,17 +49,6 @@
     bordered: true,
     showIndexColumn: false,
     clickToRowSelect: false,
-    rowKey: 'id',
-    customRow: (record) => {
-      return {
-        onClick: () => {
-          openDetailModal(true, record);
-        },
-        style: {
-          cursor: 'pointer',
-        },
-      };
-    },
   });
 </script>
 
